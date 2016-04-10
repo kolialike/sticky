@@ -19,21 +19,24 @@ var path = {
         js: 'build/js/',
         css: 'build/css/',
         img: 'build/img/',
-        fonts: 'build/fonts/'
+        fonts: 'build/fonts/',
+        vendor_js: 'build/vendor/'
     },
     src: { //Пути откуда брать исходники
         html: 'src/html/*.html', //Синтаксис src/*.html говорит gulp что мы хотим взять все файлы с расширением .html
         js: 'src/js/*.js',//В стилях и скриптах нам понадобятся только main файлы
         sass: 'src/sass/*.sass',
         img: 'src/img/**/*.*', //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
-        fonts: 'src/fonts/**/*.*'
+        fonts: 'src/fonts/**/*.*',
+        vendor_js: 'src/vendor/vendor.js'
     },
     watch: { //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
         html: 'src/html/**/*.html',
         js: 'src/js/**/*.js',
         sass: 'src/sass/**/*.sass',
         img: 'src/img/**/*.*',
-        fonts: 'src/fonts/**/*.*'
+        fonts: 'src/fonts/**/*.*',
+        vendor_js: 'src/vendor/*.*'
     },
     clean: './build'
 };
@@ -118,6 +121,21 @@ gulp.task('fonts:build', function() {
         .pipe(gulp.dest(path.build.fonts))
 });
 
+//task vendor js
+gulp.task('vendor_js:build', function () {
+    gulp.src(path.src.vendor_js) //Найдем наш main файл
+        .pipe(plumber({
+            errorHandler: function (error) {
+                console.log(error.message);
+                this.emit('end');
+            }
+        }))
+        .pipe(rigger()) //Прогоним через rigger
+        .pipe(uglify()) //Сожмем наш js
+        .pipe(gulp.dest(path.build.vendor_js)) //Выплюнем готовый файл в build
+        .pipe(connect.reload()); //И перезагрузим сервер
+});
+
 //gulp clean
 gulp.task('clean', function (cb) {
     rimraf(path.clean, cb);
@@ -130,7 +148,8 @@ gulp.task('build', [
     'js:build',
     'sass:build',
     'fonts:build',
-    'image:build'
+    'image:build',
+    'vendor_js:build'
 ]);
 
 //gulp watch
@@ -150,7 +169,12 @@ gulp.task('watch', function(){
     watch([path.watch.fonts], function(event, cb) {
         gulp.start('fonts:build');
     });
+    watch([path.watch.vendor_js], function(event, cb) {
+        gulp.start('vendor_js:build');
+    });
 });
+
+
 
 //gulp default
 gulp.task('default', [ 'build', 'webserver', 'watch']);
