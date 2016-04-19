@@ -1,0 +1,28 @@
+.main-content-item
+	text-align: center
+.plaseholder
+	width: 100%
+	height: 200px
+	display: block
+.bar
+	max-width: 600px
+	background: #333333
+	display: inline-block
+	margin: auto
+	height: 50px
+	position: relative
+	z-index: 5
+	width: 100%
+	&.bar-gray
+		background-color: rgb(153, 153, 153)
+		z-index: 6
+	&.bar-fixed
+		position: fixed
+		top: 0
+		left: 50%
+		margin-left: -300px
+		+breakpoint($break-600)
+			left: 0
+			margin-left: 0
+.followWrap
+	height: 50px
